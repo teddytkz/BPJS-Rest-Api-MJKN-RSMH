@@ -209,18 +209,39 @@ class Api extends REST_Controller {
         return $jumlah_daftar_poli;
     }
 
-    private function check_kuota_poli($id_poli,$tanggal){
-        // $this->db->select('das');
-        // $this->db->from('poli');
-        // $this->db->where('id_poli',$id_poli);
-        // $kuota_poli=$this->db->get()->result();
-        // return $kuota_poli[0]->kuota_poli;
 
-        
+
+
+    public function checkkuota_get($id_poli,$tanggal){
+        $check_hari=$this->hari($tanggal);
+        $check_poli_libur=$this->checkpolilibur_get($tanggal);
+        $this->db->select('dokter.id_poli,SUM(kuota) as kuota');
+        $this->db->from('jadwal_dokter');
+        $this->db->join('dokter','jadwal_dokter.id_dokter=dokter.id_dokter');
+        $this->db->where('jadwal_dokter.haripraktek',$check_hari);
+        $this->db->where('dokter.id_poli',$id_poli);
+        if(sizeof($check_poli_libur)>0){
+            $this->db->where_not_in('jadwal_dokter.id_jadwal',$check_poli_libur);
+        }
+        $this->db->group_by('id_poli');
+        $qry=$this->db->get()->result();
+        return $qry;
     }
 
-    public function hari_get(){
-        $tanggal="2020-02-25";
+    public function checkpolilibur_get($tanggal){
+        $this->db->select('jadwal_libur.*');
+        $this->db->from('jadwal_libur');
+        $this->db->where('jadwal_libur.tanggal',$tanggal);
+        $jadwallibur=$this->db->get()->result();
+        $data=array();
+        $i=0;
+        foreach($jadwallibur as $hasil){
+            $data[$i++]=$hasil->id_jadwal;
+        }
+        return $data;
+    }
+
+    private function hari($tanggal){
         $day=date('D',strtotime($tanggal));
         $hari_ini=0;
         switch($day){
@@ -252,7 +273,7 @@ class Api extends REST_Controller {
                 $hari_ini = 7;
             break;
         }
-        echo $hari_ini;
+        return $hari_ini;
     
     }
 
@@ -360,7 +381,7 @@ class Api extends REST_Controller {
         return json_decode($result,true);
     }
 
-    public function nokar_get(){
+    public function nokar_get($nomorkartu){
         $data = "5498";
         $secretKey = "5fBFF7C588";
         $tanggal=date('Y-m-d');
@@ -389,52 +410,5 @@ class Api extends REST_Controller {
         echo var_dump($result);
     }
 
-    // $dbmysql = $this->load->database('sqlserver', true);
-
-    // public function cekjadwaldokter_get($id_poli,$hari){
-    //     $this->db->select('dokter.*,jadwal_dokter.*');
-    //     $this->db->from('dokter');
-    //     $this->db->where('dokter.id_poli',$id_poli);
-    //     $this->db->where('jadwal_dokter.haripraktek',$hari);
-    //     $this->db->where('libur',0);
-    //     $this->db->where('active',1);
-    //     $this->db->join('jadwal_dokter','jadwal_dokter.id_dokter=dokter.id_dokter','left');
-    //     $jadwal_dokter=$this->db->get()->result();
-    //     var_dump($jadwal_dokter);
-    // }
-
-    // private function checkhari($tanggal){
-    //     $day=date('D',strtotime($tanggal));
-    //     $hari_ini=0;
-    //     switch($day){
-    //         case 'Sun':
-    //             $hari_ini = 1;
-    //         break;
     
-    //         case 'Mon':			
-    //             $hari_ini = 2;
-    //         break;
-    
-    //         case 'Tue':
-    //             $hari_ini = 3;
-    //         break;
-    
-    //         case 'Wed':
-    //             $hari_ini = 4;
-    //         break;
-    
-    //         case 'Thu':
-    //             $hari_ini = 5;
-    //         break;
-    
-    //         case 'Fri':
-    //             $hari_ini = 6;
-    //         break;
-    
-    //         case 'Sat':
-    //             $hari_ini = 7;
-    //         break;
-    //     }
-    //     return $hari_ini;
-    // }
 }
