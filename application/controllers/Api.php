@@ -62,13 +62,140 @@ class Api extends REST_Controller {
             );
         $this->response($response, 200);
     }
+    // public function noantrian_post(){
+    //     $token = $this->input->get_request_header('x-token');
+    //     $this->db->select('_bpjs_token.token');
+    //     $this->db->from('_bpjs_token');
+    //     $this->db->where('_bpjs_token.token',$token);
+    //     $verf_token=$this->db->get()->num_rows();
+
+    //     $nomorkartu=$this->post('nomorkartu');
+    //     $nik=$this->post('nik');
+    //     $notelp=$this->post('notelp');
+    //     $tanggalperiksa=$this->post('tanggalperiksa');
+    //     $kodepoli=$this->post('kodepoli');
+    //     $nomorreferensi=$this->post('nomorreferensi');
+    //     $jenisreferensi=$this->post('jenisreferensi');
+    //     $jenisrequest=$this->post('jenisrequest');
+    //     $polieksekutif=$this->post('polieksekutif');
+
+    //     $check_data_bpjs=$this->get_data_bpjs($nomorkartu);
+
+    //     $data_rec=array(
+    //         'nomor_kartu'=>$nomorkartu,
+    //         'nik'=>$nik,
+    //         'no_telp'=>$notelp,
+    //         'tanggal_periksa'=>$tanggalperiksa,
+    //         'kode_poli'=>$kodepoli,
+    //         'nomor_ref'=>$nomorreferensi,
+    //         'jenis_referensi'=>$jenisreferensi,
+    //         'jenis_request'=>$jenisrequest,
+    //         'poli_eksekutif'=>$polieksekutif,
+    //         'created_on'=>date('Y-m-d H:i:s')
+    //     );
+    //     $save_data_rec=$this->db->insert('_bpjs_antrian',$data_rec);
+
+    //     if($verf_token!=0){
+    //         if($jenisrequest==2){
+    //             $response=array(
+    //                         'metadata'=>array(
+    //                                         'message'=>'Tidak Bisa Langsung Mendaftar ke Poli',
+    //                                         'code'=>403
+    //                                     )
+    //                     );
+    //             $this->response($response, 403);
+    //         }else{
+    //             if($polieksekutif==1){
+    //                 $response=array(
+    //                         'metadata'=>array(
+    //                                         'message'=>'Tidak Bisa Mendaftar Ke Poli Eksekutif',
+    //                                         'code'=>403
+    //                                     )
+    //                     );
+    //                 $this->response($response, 403);
+    //             }else{
+    //                 $this->db->select('poli.*');
+    //                 $this->db->from('poli');
+    //                 $this->db->where('kode_poli_bpjs',$kodepoli);
+    //                 $poli_tujuan_qry=$this->db->get()->result();
+    //                 if(!empty($poli_tujuan_qry)){
+    //                     $poli_tujuan=$poli_tujuan_qry[0]->id_poli;
+    //                     $check_daftar_via_bpjs=$this->check_daftar_via_bpjs($poli_tujuan,$tanggalperiksa);
+    //                     $check_kuota_poli=$this->check_kuota_poli($poli_tujuan);
+
+    //                     if($check_daftar_via_bpjs>$check_kuota_poli){
+    //                         $response=array(
+    //                                         'metadata'=>array(
+    //                                                         'message'=>'Kuota Pendaftaran Rumah Sakit Habis',
+    //                                                         'code'=>403
+    //                                                     )
+    //                                 );
+    //                         $this->response($response, 403);
+    //                     }
+    //                     else{
+    //                         $nomor_book='RSMH-'.$poli_tujuan.'-BPJS'.time().rand(100,300);
+    //                         $data_save_to_pendaftaran_online=array(
+    //                             'nomor_bpjs'=>$nomorkartu,
+    //                             'nik'=>$nik,
+    //                             'nomortelepon'=>$notelp,
+    //                             'rencana_kunjungan'=>$tanggalperiksa,
+    //                             'poli_tujuan'=>$poli_tujuan,
+    //                             'nomor_referensi'=>$nomorreferensi,
+    //                             'jenis_referensi'=>$jenisreferensi,
+    //                             'jenis_request'=>$jenisrequest,
+    //                             'poli_eksekutif'=>$polieksekutif,
+    //                             'status_pasien'=>2,
+    //                             'jenis_pembayaran'=>'BPJS',
+    //                             'created_on'=>date('Y-m-d H:i:s'),
+    //                             'nomor_book'=>$nomor_book,
+                                
+    //                         );
+    //                         $this->db->insert('pendaftaran_online',$data_save_to_pendaftaran_online);
+    //                         $response=array(
+    //                                         'response'=>array(
+    //                                                         'nomorantrean'=>'B'.$check_daftar_via_bpjs,
+    //                                                         'kodebooking'=>$nomor_book,
+    //                                                         'jenisantrean'=>$jenisrequest,
+    //                                                         'estimasidilayani'=>strtotime($tanggalperiksa." 08:00:00"),
+    //                                                         'namapoli'=>$poli_tujuan_qry[0]->poli,
+    //                                                         'namadokter'=>'',
+    //                                                         // 'nomor_rm'=>$check_data_bpjs['response']['peserta']['mr']['noMR']
+    //                                                     ),
+    //                                         'metadata'=>array(
+    //                                                         'message'=>'OK',
+    //                                                         'code'=>200
+    //                                                     )
+    //                                 );
+    //                         $this->response($response, 200);
+    //                     }
+    //                 }
+    //                 else{
+    //                    $response=array(
+                            
+    //                         'metadata'=>array(
+    //                                         'message'=>'Poli Tidak Tersedia',
+    //                                         'code'=>400
+    //                                     )
+    //                     );
+    //                     $this->response($response, 400); 
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     else{
+    //         $response=array(
+    //             'metadata'=>array(
+    //                             'message'=>'Forbidden',
+    //                             'code'=>403
+    //                         )
+    //         );
+    //         $this->response($response, 403);
+    //     }
+    // }
+
     public function noantrian_post(){
         $token = $this->input->get_request_header('x-token');
-        $this->db->select('_bpjs_token.token');
-        $this->db->from('_bpjs_token');
-        $this->db->where('_bpjs_token.token',$token);
-        $verf_token=$this->db->get()->num_rows();
-
+        $verf_token=$this->verifikasi_token($token);
         $nomorkartu=$this->post('nomorkartu');
         $nik=$this->post('nik');
         $notelp=$this->post('notelp');
@@ -78,9 +205,6 @@ class Api extends REST_Controller {
         $jenisreferensi=$this->post('jenisreferensi');
         $jenisrequest=$this->post('jenisrequest');
         $polieksekutif=$this->post('polieksekutif');
-
-        $check_data_bpjs=$this->get_data_bpjs($nomorkartu);
-
         $data_rec=array(
             'nomor_kartu'=>$nomorkartu,
             'nik'=>$nik,
@@ -93,103 +217,128 @@ class Api extends REST_Controller {
             'poli_eksekutif'=>$polieksekutif,
             'created_on'=>date('Y-m-d H:i:s')
         );
-        $save_data_rec=$this->db->insert('_bpjs_antrian',$data_rec);
-
+        $save_data_raw=$this->db->insert('_bpjs_antrian',$data_rec);
+        $check_data_bpjs=$this->get_data_bpjs($nomorkartu);
         if($verf_token!=0){
-            if($jenisrequest==2){
-                $response=array(
-                            'metadata'=>array(
-                                            'message'=>'Tidak Bisa Langsung Mendaftar ke Poli',
-                                            'code'=>403
-                                        )
-                        );
-                $this->response($response, 403);
-            }else{
-                if($polieksekutif==1){
-                    $response=array(
-                            'metadata'=>array(
-                                            'message'=>'Tidak Bisa Mendaftar Ke Poli Eksekutif',
-                                            'code'=>403
-                                        )
-                        );
-                    $this->response($response, 403);
-                }else{
-                    $this->db->select('poli.*');
-                    $this->db->from('poli');
-                    $this->db->where('kode_poli_bpjs',$kodepoli);
-                    $poli_tujuan_qry=$this->db->get()->result();
-                    if(!empty($poli_tujuan_qry)){
-                        $poli_tujuan=$poli_tujuan_qry[0]->id_poli;
-                        $check_daftar_via_bpjs=$this->check_daftar_via_bpjs($poli_tujuan,$tanggalperiksa);
-                        $check_kuota_poli=$this->check_kuota_poli($poli_tujuan);
-
-                        if($check_daftar_via_bpjs>$check_kuota_poli){
-                            $response=array(
-                                            'metadata'=>array(
-                                                            'message'=>'Kuota Pendaftaran Rumah Sakit Habis',
-                                                            'code'=>403
+            $check_nomor_kartu=$this->checknomorkartu($nomorkartu);
+            if($check_nomor_kartu['metaData']['code']==200){
+                $checktanggal=$this->checktanggal($tanggalperiksa);
+                if($checktanggal==TRUE){
+                    $check_hari_kunjungan=$this->check_hari_kunjungan($tanggalperiksa,$nomorkartu);
+                    if($check_hari_kunjungan==TRUE){
+                        $convert_poli=$this->convert_poli($kodepoli);
+                        if(!empty($convert_poli)){
+                            $poli_tujuan=$convert_poli[0]->id_poli;
+                            $checkkuota_get=$this->checkkuota_get($poli_tujuan,$tanggalperiksa);
+                            if(!empty($checkkuota_get)){
+                                $check_daftar_via_bpjs=$this->check_daftar_via_bpjs($poli_tujuan,$tanggalperiksa);
+                                if($checkkuota_get[0]->kuota>$check_daftar_via_bpjs){
+                                    $cek_pendaftaran=$this->cek_pendaftaran($nik,$tanggalperiksa);
+                                    if($cek_pendaftaran==0){
+                                        $nomor_book='RSMH-'.$poli_tujuan.'-BPJS'.time().rand(100,300);
+                                        $data_save_to_pendaftaran_online=array(
+                                            'nomor_bpjs'=>$nomorkartu,
+                                            'nik'=>$nik,
+                                            'nomortelepon'=>$notelp,
+                                            'rencana_kunjungan'=>$tanggalperiksa,
+                                            'poli_tujuan'=>$poli_tujuan,
+                                            'nomor_referensi'=>$nomorreferensi,
+                                            'jenis_referensi'=>$jenisreferensi,
+                                            'jenis_request'=>$jenisrequest,
+                                            'poli_eksekutif'=>$polieksekutif,
+                                            'status_pasien'=>2,
+                                            'jenis_pembayaran'=>'BPJS',
+                                            'created_on'=>date('Y-m-d H:i:s'),
+                                            'nomor_book'=>$nomor_book,
+                                            
+                                        );
+                                        $this->db->insert('pendaftaran_online',$data_save_to_pendaftaran_online);
+                                        $response=array(
+                                                        'response'=>array(
+                                                                        'nomorantrean'=>'B'.$check_daftar_via_bpjs,
+                                                                        'kodebooking'=>$nomor_book,
+                                                                        'jenisantrean'=>$jenisrequest,
+                                                                        'estimasidilayani'=>strtotime($tanggalperiksa." 08:00:00"),
+                                                                        'namapoli'=>$convert_poli[0]->poli,
+                                                                        'namadokter'=>'',
+                                                                    ),
+                                                        'metadata'=>array(
+                                                                        'message'=>'OK',
+                                                                        'code'=>200
+                                                                    )
+                                                );
+                                        $this->response($response, 200);
+                                    }else{
+                                        $response=array(
+                                                    'metadata'=>array(
+                                                                'message'=>"Sudah Pernah Mendaftar",
+                                                                'code'=>400
+                                                        )
+                                        );
+                                        $this->response($response, 400); 
+                                    }
+                                }else{
+                                    $response=array(
+                                                    'metadata'=>array(
+                                                                'message'=>"Kuota Habis",
+                                                                'code'=>400
                                                         )
                                     );
-                            $this->response($response, 403);
-                        }
-                        else{
-                            $nomor_book='RSMH-'.$poli_tujuan.'-BPJS'.time().rand(100,300);
-                            $data_save_to_pendaftaran_online=array(
-                                'nomor_bpjs'=>$nomorkartu,
-                                'nik'=>$nik,
-                                'nomortelepon'=>$notelp,
-                                'rencana_kunjungan'=>$tanggalperiksa,
-                                'poli_tujuan'=>$poli_tujuan,
-                                'nomor_referensi'=>$nomorreferensi,
-                                'jenis_referensi'=>$jenisreferensi,
-                                'jenis_request'=>$jenisrequest,
-                                'poli_eksekutif'=>$polieksekutif,
-                                'status_pasien'=>2,
-                                'jenis_pembayaran'=>'BPJS',
-                                'created_on'=>date('Y-m-d H:i:s'),
-                                'nomor_book'=>$nomor_book,
-                                
-                            );
-                            $this->db->insert('pendaftaran_online',$data_save_to_pendaftaran_online);
+                                    $this->response($response, 400);
+                                }
+                            }else{
+                                $response=array(
+                                    'metadata'=>array(
+                                            'message'=>'Poli Tidak Tersedia / Dokter Libur',
+                                            'code'=>400
+                                    )
+                                );
+                                $this->response($response, 400);
+                            }
+                        }else{
                             $response=array(
-                                            'response'=>array(
-                                                            'nomorantrean'=>'B'.$check_daftar_via_bpjs,
-                                                            'kodebooking'=>$nomor_book,
-                                                            'jenisantrean'=>$jenisrequest,
-                                                            'estimasidilayani'=>strtotime($tanggalperiksa." 08:00:00"),
-                                                            'namapoli'=>$poli_tujuan_qry[0]->poli,
-                                                            'namadokter'=>'',
-                                                            // 'nomor_rm'=>$check_data_bpjs['response']['peserta']['mr']['noMR']
-                                                        ),
-                                            'metadata'=>array(
-                                                            'message'=>'OK',
-                                                            'code'=>200
-                                                        )
-                                    );
-                            $this->response($response, 200);
-                        }
-                    }
-                    else{
-                       $response=array(
-                            
-                            'metadata'=>array(
+                                    'metadata'=>array(
                                             'message'=>'Poli Tidak Tersedia',
                                             'code'=>400
-                                        )
+                                    )
+                            );
+                            $this->response($response, 400); 
+                        } 
+                    }else{
+                        $response=array(
+                            'metadata'=>array(
+                                'message'=>'Rujukan Sudah Lewat 90 Hari',
+                                'code'=>400
+                            )
                         );
-                        $this->response($response, 400); 
+                        $this->response($response, 400);
                     }
+                }else{
+                    $response=array(
+                    'metadata'=>array(
+                                'message'=>'Tanggal Tidak Sesuai atau Backdate',
+                                'code'=>400
+                            )
+                    );
+                    $this->response($response, 400);
                 }
+            }else{
+                $response=array(
+                    'metadata'=>array(
+                                'message'=>$check_nomor_kartu['metaData']['message'],
+                                'code'=>$check_nomor_kartu['metaData']['code']
+                            )
+                );
+                $this->response($response, 400);
             }
-        }
-        else{
+        }else{
             $response=array(
                 'metadata'=>array(
                                 'message'=>'Forbidden',
                                 'code'=>403
                             )
             );
-            $this->response($response, 403);
+            $this->response($response, 403); 
         }
     }
 
@@ -209,10 +358,24 @@ class Api extends REST_Controller {
         return $jumlah_daftar_poli;
     }
 
+    private function checktanggal($tanggal){
+        if($tanggal==""){
+            return FALSE;
+        }
+        else{
+            $tanggal=strtotime($tanggal);
+            $tanggal_sekarang=strtotime(date('Y-m-d'));
+            if($tanggal>=$tanggal_sekarang){
+                return TRUE;
+            }
+            else{
+                return FALSE;
+            }
+        }
+    }
 
 
-
-    public function checkkuota_get($id_poli,$tanggal){
+    private function checkkuota_get($id_poli,$tanggal){
         $check_hari=$this->hari($tanggal);
         $check_poli_libur=$this->checkpolilibur_get($tanggal);
         $this->db->select('dokter.id_poli,SUM(kuota) as kuota');
@@ -226,9 +389,10 @@ class Api extends REST_Controller {
         $this->db->group_by('id_poli');
         $qry=$this->db->get()->result();
         return $qry;
+        //var_dump($qry);
     }
 
-    public function checkpolilibur_get($tanggal){
+    private function checkpolilibur_get($tanggal){
         $this->db->select('jadwal_libur.*');
         $this->db->from('jadwal_libur');
         $this->db->where('jadwal_libur.tanggal',$tanggal);
@@ -241,40 +405,13 @@ class Api extends REST_Controller {
         return $data;
     }
 
-    private function hari($tanggal){
-        $day=date('D',strtotime($tanggal));
-        $hari_ini=0;
-        switch($day){
-            case 'Sun':
-                $hari_ini = 1;
-            break;
-    
-            case 'Mon':			
-                $hari_ini = 2;
-            break;
-    
-            case 'Tue':
-                $hari_ini = 3;
-            break;
-    
-            case 'Wed':
-                $hari_ini = 4;
-            break;
-    
-            case 'Thu':
-                $hari_ini = 5;
-            break;
-    
-            case 'Fri':
-                $hari_ini = 6;
-            break;
-    
-            case 'Sat':
-                $hari_ini = 7;
-            break;
-        }
-        return $hari_ini;
-    
+    private function cek_pendaftaran($nik,$tanggalperiksa){
+        $this->db->select('pendaftaran_online.*');
+        $this->db->from('pendaftaran_online');
+        $this->db->where('nik',$nik);
+        $this->db->where('rencana_kunjungan',$tanggalperiksa);
+        $qry=$this->db->get()->num_rows();
+        return $qry;
     }
 
     public function rekapantrean_get(){
@@ -352,7 +489,59 @@ class Api extends REST_Controller {
         return $verf_token;
     }
 
+    private function check_hari_kunjungan($tanggal_rencana_kunjungan,$nomorkartu){
+        $get_data_rujukan=$this->get_data_rujukan($nomorkartu);
+        $add_90_day=date('Y-m-d',strtotime($get_data_rujukan['response']['rujukan']['tglKunjungan']."+90 day"));
+        if($tanggal_rencana_kunjungan<$add_90_day){
+            return TRUE;
+        }else{
+            return FALSE;
+        }
+    }
+
+    private function convert_poli($idpoli){
+        $this->db->select('poli.*');
+        $this->db->from('poli');
+        $this->db->where('kode_poli_bpjs',$idpoli);
+        $poli_tujuan_qry=$this->db->get()->result();
+        return $poli_tujuan_qry;
+    }
+
+    private function hari($tanggal){
+        $day=date('D',strtotime($tanggal));
+        $hari_ini=0;
+        switch($day){
+            case 'Sun':
+                $hari_ini = 1;
+            break;
     
+            case 'Mon':			
+                $hari_ini = 2;
+            break;
+    
+            case 'Tue':
+                $hari_ini = 3;
+            break;
+    
+            case 'Wed':
+                $hari_ini = 4;
+            break;
+    
+            case 'Thu':
+                $hari_ini = 5;
+            break;
+    
+            case 'Fri':
+                $hari_ini = 6;
+            break;
+    
+            case 'Sat':
+                $hari_ini = 7;
+            break;
+        }
+        return $hari_ini;
+    
+    }    
 
     public function get_data_bpjs($nomorkartu){
         $data = "5498";
@@ -381,7 +570,33 @@ class Api extends REST_Controller {
         return json_decode($result,true);
     }
 
-    public function nokar_get($nomorkartu){
+    private function get_data_rujukan($nomorkartu){
+        $data = "5498";
+        $secretKey = "5fBFF7C588";
+        $tanggal=date('Y-m-d');
+        $url="https://new-api.bpjs-kesehatan.go.id:8080/new-vclaim-rest//Rujukan/Peserta/".$nomorkartu;
+        date_default_timezone_set('UTC');
+        $tStamp = strval(time()-strtotime('1970-01-01 00:00:00'));
+        $signature = hash_hmac('sha256', $data."&".$tStamp, $secretKey, true);
+        $encodedSignature = base64_encode($signature);
+        $opts = array(
+                    'http'=>array(
+                    'method'=>"GET",
+                    'header'=>"Host: new-api.bpjs-kesehatan.go.id\r\n".
+                    "Connection: close\r\n".
+                    "X-cons-id: ".$data."\r\n".
+                    "X-timestamp: ".$tStamp."\r\n".
+                    "X-signature: ".$encodedSignature."\r\n".
+                    "User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64)\r\n".
+                    "Accept: application/json;charset=utf-8\r\n"
+                    )
+        );
+        $context = stream_context_create($opts);
+        $result = file_get_contents($url, false, $context);
+        return json_decode($result,true);
+    }
+
+    private function checknomorkartu($nomorkartu){
         $data = "5498";
         $secretKey = "5fBFF7C588";
         $tanggal=date('Y-m-d');
@@ -403,11 +618,10 @@ class Api extends REST_Controller {
                     "Accept: application/json;charset=utf-8\r\n"
                     )
         );
-
         $context = stream_context_create($opts);
         $result = file_get_contents($url, false, $context);
-        //return json_decode($result,true);
-        echo var_dump($result);
+        return json_decode($result,true);
+        //echo var_dump($result);
     }
 
     
