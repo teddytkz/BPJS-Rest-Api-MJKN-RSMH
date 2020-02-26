@@ -260,8 +260,69 @@ class Api extends REST_Controller {
     }
 
     public function noantrian_get(){
+        $response=array(
+                'metadata'=>array(
+                                'message'=>'RS. Mitra Husada',
+                                'code'=>200
+                            )
+            );
+        $this->response($response, 200);        
+    }
 
-        
+    public function rekapantrean_get(){
+
+    }
+
+    public function rekapantrean_post(){
+        $token = $this->input->get_request_header('x-token');
+        $verf_token=$this->verifikasi_token($token);
+
+        $tanggalperiksa=$this->post('tanggalperiksa');
+        $kodepoli=$this->post('kodepoli');
+        $polieksekutif=$this->post('polieksekutif');
+
+
+        if($verf_token!=0){          
+            
+            $this->db->select('poli.*');
+            $this->db->from('poli');
+            $this->db->where('kode_poli_bpjs',$kodepoli);
+            $poli_tujuan_qry=$this->db->get()->result();
+            if(!empty($poli_tujuan_qry)){
+                $poli_tujuan=$poli_tujuan_qry[0]->kode_poli_simrs;
+                $jumlahdaftarpoli=$this->jumlah_daftar($poli_tujuan,$tanggalperiksa);
+                $response=array(
+                        'response'=>array(
+                                        'namapoli'=>$poli_tujuan_qry[0]->poli,
+                                        'totalantrean'=>$jumlahdaftarpoli,
+                                        'jumlahterlayani'=>0,
+                                        'lastupdate'=>time()
+                                    ),
+                        'metadata'=>array(
+                                        'message'=>'OK',
+                                        'code'=>200
+                                    )
+                );
+                $this->response($response, 200);
+            }else{
+                $response=array(
+                            'metadata'=>array(
+                                            'message'=>'Poli Tidak Tersedia',
+                                            'code'=>403
+                                        )
+                        );
+                $this->response($response, 403); 
+            }
+        }else{
+            $response=array(
+                
+                'metadata'=>array(
+                                'message'=>'Forbidden',
+                                'code'=>403
+                            )
+            );
+            $this->response($response, 403);
+        }  
     }
 
     private function check_daftar_via_bpjs($id_poli,$tanggalperiksa){
@@ -329,62 +390,6 @@ class Api extends REST_Controller {
         $this->db->where('rencana_kunjungan',$tanggalperiksa);
         $qry=$this->db->get()->num_rows();
         return $qry;
-    }
-
-    public function rekapantrean_get(){
-
-    }
-
-    public function rekapantrean_post(){
-        $token = $this->input->get_request_header('x-token');
-        $verf_token=$this->verifikasi_token($token);
-
-        $tanggalperiksa=$this->post('tanggalperiksa');
-        $kodepoli=$this->post('kodepoli');
-        $polieksekutif=$this->post('polieksekutif');
-
-
-        if($verf_token!=0){          
-            
-            $this->db->select('poli.*');
-            $this->db->from('poli');
-            $this->db->where('kode_poli_bpjs',$kodepoli);
-            $poli_tujuan_qry=$this->db->get()->result();
-            if(!empty($poli_tujuan_qry)){
-                $poli_tujuan=$poli_tujuan_qry[0]->kode_poli_simrs;
-                $jumlahdaftarpoli=$this->jumlah_daftar($poli_tujuan,$tanggalperiksa);
-                $response=array(
-                        'response'=>array(
-                                        'namapoli'=>$poli_tujuan_qry[0]->poli,
-                                        'totalantrean'=>$jumlahdaftarpoli,
-                                        'jumlahterlayani'=>0,
-                                        'lastupdate'=>time()
-                                    ),
-                        'metadata'=>array(
-                                        'message'=>'OK',
-                                        'code'=>200
-                                    )
-                );
-                $this->response($response, 200);
-            }else{
-                $response=array(
-                            'metadata'=>array(
-                                            'message'=>'Poli Tidak Tersedia',
-                                            'code'=>403
-                                        )
-                        );
-                $this->response($response, 403); 
-            }
-        }else{
-            $response=array(
-                
-                'metadata'=>array(
-                                'message'=>'Forbidden',
-                                'code'=>403
-                            )
-            );
-            $this->response($response, 403);
-        }  
     }
 
     private function jumlah_daftar($id_poli,$tanggal){
@@ -460,7 +465,7 @@ class Api extends REST_Controller {
     
     }    
 
-    public function get_data_bpjs($nomorkartu){
+    private function get_data_bpjs($nomorkartu){
         $data = "5498";
         $secretKey = "5fBFF7C588";
         $tanggal=date('Y-m-d');
