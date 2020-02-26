@@ -53,6 +53,7 @@ class Api extends REST_Controller {
             $this->response($response, 403);
         }
     }
+    
     public function token_get(){
         $response=array(
                 'metadata'=>array(
@@ -276,12 +277,9 @@ class Api extends REST_Controller {
     public function rekapantrean_post(){
         $token = $this->input->get_request_header('x-token');
         $verf_token=$this->verifikasi_token($token);
-
         $tanggalperiksa=$this->post('tanggalperiksa');
         $kodepoli=$this->post('kodepoli');
         $polieksekutif=$this->post('polieksekutif');
-
-
         if($verf_token!=0){          
             
             $this->db->select('poli.*');
@@ -367,7 +365,6 @@ class Api extends REST_Controller {
         $this->db->group_by('id_poli');
         $qry=$this->db->get()->result();
         return $qry;
-        //var_dump($qry);
     }
 
     private function checkpolilibur_get($tanggal){
@@ -462,7 +459,6 @@ class Api extends REST_Controller {
             break;
         }
         return $hari_ini;
-    
     }    
 
     private function get_data_bpjs($nomorkartu){
@@ -486,7 +482,6 @@ class Api extends REST_Controller {
                     "Accept: application/json;charset=utf-8\r\n"
                     )
         );
-
         $context = stream_context_create($opts);
         $result = file_get_contents($url, false, $context);
         return json_decode($result,true);
@@ -523,7 +518,6 @@ class Api extends REST_Controller {
         $secretKey = "5fBFF7C588";
         $tanggal=date('Y-m-d');
         $url="https://new-api.bpjs-kesehatan.go.id:8080/new-vclaim-rest/Peserta/nokartu/".$nomorkartu."/tglSEP/".$tanggal;
-        // $url="https://new-api.bpjs-kesehatan.go.id:8080/new-vclaim-rest/peserta/nokartu/0001589962612/tglSEP/2020-02-2";
         date_default_timezone_set('UTC');
         $tStamp = strval(time()-strtotime('1970-01-01 00:00:00'));
         $signature = hash_hmac('sha256', $data."&".$tStamp, $secretKey, true);
@@ -543,7 +537,6 @@ class Api extends REST_Controller {
         $context = stream_context_create($opts);
         $result = file_get_contents($url, false, $context);
         return json_decode($result,true);
-        //echo var_dump($result);
     }
 
     
