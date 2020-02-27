@@ -95,7 +95,21 @@ class Api extends REST_Controller {
             if($check_nomor_kartu['metaData']['code']==200){
                 $checktanggal=$this->checktanggal($tanggalperiksa);
                 if($checktanggal==TRUE){
-                    $check_hari_kunjungan=$this->check_hari_kunjungan($tanggalperiksa,$nomorkartu);
+                    $check_hari_kunjungan=FALSE;
+                    if($jenisreferensi==1){
+                        $check_hari_kunjungan=$this->check_hari_kunjungan($tanggalperiksa,$nomorreferensi);
+                    }else if($jenisreferensi==0){
+                        $check_hari_kunjungan=TRUE;
+                    }else{
+                        $check_hari_kunjungan=FALSE;
+                        $response=array(
+                                        'metadata'=>array(
+                                                    'message'=>'Jenis Referensi Tidak di Ketahui',
+                                                    'code'=>400
+                                            )
+                                       );
+                        $this->response($response, 400); 
+                    }
                     if($check_hari_kunjungan==TRUE){
                         $convert_poli=$this->convert_poli($kodepoli);
                         if(!empty($convert_poli)){
@@ -408,8 +422,8 @@ class Api extends REST_Controller {
         return $verf_token;
     }
 
-    private function check_hari_kunjungan($tanggal_rencana_kunjungan,$nomorkartu){
-        $get_data_rujukan=$this->get_data_rujukan($nomorkartu);
+    private function check_hari_kunjungan($tanggal_rencana_kunjungan,$nomorrujukan){
+        $get_data_rujukan=$this->get_data_rujukan($nomorrujukan);
         $add_90_day=date('Y-m-d',strtotime($get_data_rujukan['response']['rujukan']['tglKunjungan']."+90 day"));
         if($tanggal_rencana_kunjungan<$add_90_day){
             return TRUE;
@@ -487,11 +501,11 @@ class Api extends REST_Controller {
         return json_decode($result,true);
     }
 
-    private function get_data_rujukan($nomorkartu){
+    private function get_data_rujukan($nomorrujukan){
         $data = "5498";
         $secretKey = "5fBFF7C588";
         $tanggal=date('Y-m-d');
-        $url="https://new-api.bpjs-kesehatan.go.id:8080/new-vclaim-rest//Rujukan/Peserta/".$nomorkartu;
+        $url="https://new-api.bpjs-kesehatan.go.id:8080/new-vclaim-rest/Rujukan/".$nomorrujukan;
         date_default_timezone_set('UTC');
         $tStamp = strval(time()-strtotime('1970-01-01 00:00:00'));
         $signature = hash_hmac('sha256', $data."&".$tStamp, $secretKey, true);
