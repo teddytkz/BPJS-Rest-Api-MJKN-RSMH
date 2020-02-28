@@ -138,6 +138,8 @@ class Api extends REST_Controller {
                                                         'jenis_pembayaran'=>'BPJS',
                                                         'created_on'=>date('Y-m-d H:i:s'),
                                                         'nomor_book'=>$nomor_book,
+                                                        'nama_pasien'=>$check_nomor_kartu['response']['peserta']['nama'],
+                                                        'nomor_rm'=>$check_nomor_kartu['response']['peserta']['mr']['noMR'],
                                                         
                                                     );
                                                     $this->db->insert('pendaftaran_online',$data_save_to_pendaftaran_online);
@@ -294,6 +296,10 @@ class Api extends REST_Controller {
         $tanggalperiksa=$this->post('tanggalperiksa');
         $kodepoli=$this->post('kodepoli');
         $polieksekutif=$this->post('polieksekutif');
+
+
+        
+
         if($verf_token!=0){          
             
             $this->db->select('poli.*');
@@ -301,21 +307,46 @@ class Api extends REST_Controller {
             $this->db->where('kode_poli_bpjs',$kodepoli);
             $poli_tujuan_qry=$this->db->get()->result();
             if(!empty($poli_tujuan_qry)){
-                $poli_tujuan=$poli_tujuan_qry[0]->kode_poli_simrs;
-                $jumlahdaftarpoli=$this->jumlah_daftar($poli_tujuan,$tanggalperiksa);
-                $response=array(
-                        'response'=>array(
-                                        'namapoli'=>$poli_tujuan_qry[0]->poli,
-                                        'totalantrean'=>$jumlahdaftarpoli,
-                                        'jumlahterlayani'=>0,
-                                        'lastupdate'=>time()
-                                    ),
-                        'metadata'=>array(
-                                        'message'=>'OK',
-                                        'code'=>200
-                                    )
-                );
-                $this->response($response, 200);
+
+                $cek_tanggal=$this->cek_tanggal($tanggalperiksa);
+                if($cek_tanggal==TRUE){
+                    $checktanggal=$this->checktanggal($tanggalperiksa);
+                    if($checktanggal==TRUE){
+                        $poli_tujuan=$poli_tujuan_qry[0]->kode_poli_simrs;
+                        $jumlahdaftarpoli=$this->jumlah_daftar($poli_tujuan,$tanggalperiksa);
+                        $response=array(
+                                'response'=>array(
+                                                'namapoli'=>$poli_tujuan_qry[0]->poli,
+                                                'totalantrean'=>$jumlahdaftarpoli,
+                                                'jumlahterlayani'=>0,
+                                                'lastupdate'=>time()
+                                            ),
+                                'metadata'=>array(
+                                                'message'=>'OK',
+                                                'code'=>200
+                                            )
+                        );
+                        $this->response($response, 200);
+                    }else{
+                        $response=array(
+                            'metadata'=>array(
+                                            'message'=>'Format Tanggal Salah / Backdate',
+                                            'code'=>400
+                                        )
+                        );
+                        $this->response($response, 400); 
+                    }
+                }else{
+                    $response=array(
+                            'metadata'=>array(
+                                            'message'=>'Format Tanggal Salah',
+                                            'code'=>400
+                                        )
+                        );
+                    $this->response($response, 400);   
+                }
+
+                
             }else{
                 $response=array(
                             'metadata'=>array(
@@ -473,7 +504,18 @@ class Api extends REST_Controller {
             break;
         }
         return $hari_ini;
-    }    
+    }  
+    
+    private function cek_tanggal($tanggal){
+        $date=$tanggal;
+        $format = 'Y-m-d';
+        $d = DateTime::createFromFormat($format, $date);
+        if($d->format($format)==$date){
+            return TRUE;
+        }else{
+            return FALSE;
+        }
+    }
 
     private function get_data_bpjs($nomorkartu){
         $data = "5498";
