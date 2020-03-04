@@ -140,7 +140,7 @@ class Api extends REST_Controller {
                                                         'nomor_book'=>$nomor_book,
                                                         'nama_pasien'=>$check_nomor_kartu['response']['peserta']['nama'],
                                                         'nomor_rm'=>$check_nomor_kartu['response']['peserta']['mr']['noMR'],
-                                                        
+                                                        'tanggallahir'=>$check_nomor_kartu['response']['peserta']['tglLahir'] 
                                                     );
                                                     $this->db->insert('pendaftaran_online',$data_save_to_pendaftaran_online);
                                                     $response=array(
